@@ -5,6 +5,8 @@ public class Player
 	public int turnScore;
 	public int gameScore; // for now, same as roundScore
 	public int numberChips;
+	public Object[] scoreSkunkRoll;
+
 
 	public Player()
 	{
@@ -76,6 +78,11 @@ public class Player
 		return this.gameScore;
 	}
 
-
+	public void scoreSkunkRoll(int i) {
+		// TODO Auto-generated method stub
+		
+		setNumberChips(getNumberChips() - 4);
+		setTurnScore(0);
+	}
 
 }

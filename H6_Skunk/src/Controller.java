@@ -1,8 +1,10 @@
 import java.util.ArrayList;
 import edu.princeton.cs.introcs.*;
 
-public class SkunkDomain
+public class Controller
 {
+	private static final int skunk_Double_sum = 2;
+	private static final int skunk_Deuce_Sum = 3;
 	public SkunkUI skunkUI;
 	public UI ui;
 	public int numberOfPlayers;
@@ -15,10 +17,11 @@ public class SkunkDomain
 
 	public boolean wantsToQuit;
 	public boolean oneMoreRoll;
+	public Object[] scoreSkunkRoll;
 
 	public Dice skunkDice;
 
-	public SkunkDomain(SkunkUI ui)
+	public Controller(SkunkUI ui)
 	{
 		this.skunkUI = ui;
 		this.ui = ui; // hide behind the interface UI
@@ -54,38 +57,37 @@ public class SkunkDomain
 			ui.println("Next player is " + playerNames[activePlayerIndex] + ".");
 			activePlayer.setTurnScore(0);
 			
-			String wantsToRollStr = ui.promptReadAndReturn("Roll? y or n");
-			boolean wantsToRoll = 'y' == wantsToRollStr.toLowerCase().charAt(0);
+			
+			boolean wantsToRoll =  getRollChoice();//wantsToRollStr.toLowerCase().charAt(0);
 			
 			while (wantsToRoll)
 			{
 				activePlayer.setRollScore(0);
 				skunkDice.roll();
-				if (skunkDice.getLastRoll() == 2)
+				if (doubleskunk())
 				{
 					ui.println("Two Skunks! You lose the turn, zeroing out both turn and game scores and paying 4 chips to the kitty");
 					kitty += 4;
-					activePlayer.setNumberChips(activePlayer.getNumberChips() - 4);
-					activePlayer.setTurnScore(0);
+					activePlayer.scoreSkunkRoll(4);
 					activePlayer.setGameScore(0);
 					wantsToRoll = false;
 					break;
 				}
-				else if (skunkDice.getLastRoll() == 3)
+				else if (skunkDeuce())
 				{
 					ui.println(
 							"Skunks and Deuce! You lose the turn, zeroing out the turn score and paying 2 chips to the kitty");
 					kitty += 2;
-					activePlayer.setNumberChips(activePlayer.getNumberChips() - 2);
+					activePlayer.scoreSkunkRoll(2);
 					activePlayer.setTurnScore(0);
 					wantsToRoll = false;
 					break;
 				}
-				else if (skunkDice.getDie1().getLastRoll() == 1 || skunkDice.getDie2().getLastRoll() == 1)
+				else if (regularSkunk())
 				{
 					ui.println("One Skunk! You lose the turn, zeroing out the turn score and paying 1 chip to the kitty");
 					kitty += 1;
-					activePlayer.setNumberChips(activePlayer.getNumberChips() - 1);
+					activePlayer.scoreSkunkRoll(1);
 					activePlayer.setTurnScore(0);
 					wantsToRoll = false;
 					break;
@@ -97,8 +99,8 @@ public class SkunkDomain
 				ui.println(
 						"Roll of " + skunkDice.toString() + ", gives new turn score of " + activePlayer.getTurnScore());
 
-				wantsToRollStr = ui.promptReadAndReturn("Roll again? y or n");
-				wantsToRoll = 'y' == wantsToRollStr.toLowerCase().charAt(0);
+				wantsToRoll = getRollChoice();
+				
 
 			}
 
@@ -147,7 +149,7 @@ public class SkunkDomain
 				skunkDice.roll();
 				ui.println("Roll is " + skunkDice.toString() + "\n");
 
-				if (skunkDice.getLastRoll() == 2)
+				if (doubleskunk())
 				{
 					ui.println("Two Skunks! You lose the turn, zeroing out both turn and game scores and paying 4 chips to the kitty");
 					kitty += 4;
@@ -157,7 +159,7 @@ public class SkunkDomain
 					wantsToRoll = false;
 					break;
 				}
-				else if (skunkDice.getLastRoll() == 3)
+				else if (skunkDeuce())
 				{
 					ui.println(
 							"Skunks and Deuce! You lose the turn, zeroing out the turn score and paying 2 chips to the kitty");
@@ -167,7 +169,7 @@ public class SkunkDomain
 					wantsToRoll = false;
 
 				}
-				else if (skunkDice.getDie1().getLastRoll() == 1 || skunkDice.getDie2().getLastRoll() == 1)
+				else if (regularSkunk())
 				{
 					ui.println("One Skunk!  You lose the turn, zeroing out the turn score and paying 1 chip to the kitty");
 					kitty += 1;
@@ -236,6 +238,27 @@ public class SkunkDomain
 
 		ui.println("-----------------------");
 		return true;
+	}
+
+	private boolean doubleskunk() {
+		return skunkDice.getLastRoll() == skunk_Double_sum;
+	}
+
+	private boolean skunkDeuce() {
+		return skunkDice.getLastRoll() == skunk_Deuce_Sum;
+	}
+
+	private boolean regularSkunk() {
+		return doubleSkunk();
+	}
+
+	private boolean doubleSkunk() {
+		return skunkDice.getDie1().getLastRoll() == 1 || skunkDice.getDie2().getLastRoll() == 1;
+	}
+
+	private boolean getRollChoice() {
+		String wantsToRollStr = ui.promptReadAndReturn("Roll? y or n");
+		return'y' == wantsToRollStr.toLowerCase().charAt(0);
 	}
 
 }
